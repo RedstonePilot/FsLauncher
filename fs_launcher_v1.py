@@ -1,3 +1,4 @@
+"""module providing the path function"""
 import os
 import csv
 import threading
@@ -29,6 +30,38 @@ class App(customtkinter.CTk):
         self.thread_main.start()
         self.fs_fg = 0
         self.st_fg = 0
+        self.sidebar_frame = customtkinter.CTkFrame(
+            self, width=140, corner_radius=0)
+        self.paths_frame = customtkinter.CTkFrame(
+            self, width=self.winfo_width()-140, corner_radius=0)
+        self.va_frame = customtkinter.CTkFrame(self, corner_radius=10)
+        self.ot_frame = customtkinter.CTkFrame(self, corner_radius=10)
+        self.on_frame = customtkinter.CTkFrame(self, corner_radius=10)
+        self.logo_label = customtkinter.CTkLabel(
+            self.sidebar_frame, text="Fs Launcher", font=customtkinter.CTkFont(size=20,
+                                                                               weight="bold"))
+        self.appearance_mode_label = customtkinter.CTkLabel(
+            self.sidebar_frame, text="Appearance Mode:", anchor="w")
+        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame,
+                                                                       values=[
+                                                                           "Dark", "Light", "System"],
+                                                                       command=self.change_appearance_mode_event)
+        self.steam_there = customtkinter.CTkButton(
+            self.paths_frame, text="Search for Steam", command=self.search_steam, fg_color=self.st_fg)
+        self.fs_there = customtkinter.CTkButton(
+            self.paths_frame, text="Search for MSFS", command=self.search_fs, fg_color=self.fs_fg)
+        self.launch = customtkinter.CTkButton(
+            self.paths_frame, text="Launch!", command=self.launch_now)
+
+        self.va_list = ["None"]
+        self.ot_list = []
+        self.on_list = ["None"]
+
+        self.paths = 0
+
+        self.va_radio_var = StringVar(value=self.va_list[0])
+        self.on_radio_var = StringVar(value=self.on_list[0])
+        self.ot_check_var = customtkinter.StringVar(value="on")
 
     def draw_window(self):
         """Draws the window and gathers the appropriate data to display"""
@@ -37,7 +70,8 @@ class App(customtkinter.CTk):
             self.fs_fg = "red3"
             self.st_fg = "red3"
             with open("paths.csv", "w", encoding="utf-8")as startfile:  # creates file
-                pass
+                startfile.close()
+
         else:
             with open("paths.csv", "r", encoding="utf-8")as checkfile:
                 data = csv.reader(checkfile)
@@ -64,53 +98,40 @@ class App(customtkinter.CTk):
         self.grid_rowconfigure((0, 1, 2), weight=1)
 
         # create sidebar frame with widgets
-        self.sidebar_frame = customtkinter.CTkFrame(
-            self, width=140, corner_radius=0)
+
         self.sidebar_frame.grid(row=0, column=0, rowspan=4, sticky="nsew")
         self.sidebar_frame.grid_rowconfigure(4, weight=1)
         self.update()
-        self.paths_frame = customtkinter.CTkFrame(
-            self, width=self.winfo_width()-140, corner_radius=0)
+
         self.paths_frame.grid(row=0, column=1, sticky="nsew",
                               columnspan=3, padx=(20, 0))
         self.paths_frame.grid_columnconfigure(1, weight=1)
         self.paths_frame.grid_columnconfigure(2, weight=1)
         self.paths_frame.grid_columnconfigure(3, weight=1)
 
-        self.va_frame = customtkinter.CTkFrame(self, corner_radius=10)
         self.va_frame.grid(row=1, column=1, sticky="nsew",
                            padx=(20, 10), pady=20)
-        self.ot_frame = customtkinter.CTkFrame(self, corner_radius=10)
+
         self.ot_frame.grid(row=1, column=2, sticky="nsew", padx=10, pady=20)
-        self.on_frame = customtkinter.CTkFrame(self, corner_radius=10)
+
         self.on_frame.grid(row=1, column=3, sticky="nsew",
                            padx=(10, 20), pady=20)
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure(2, weight=1)
         self.grid_columnconfigure(3, weight=1)
-        self.logo_label = customtkinter.CTkLabel(
-            self.sidebar_frame, text="Fs Launcher", font=customtkinter.CTkFont(size=20, weight="bold"))
+
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
 
-        self.appearance_mode_label = customtkinter.CTkLabel(
-            self.sidebar_frame, text="Appearance Mode:", anchor="w")
         self.appearance_mode_label.grid(row=5, column=0, padx=20, pady=(10, 0))
-        self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["Dark", "Light", "System"],
-                                                                       command=self.change_appearance_mode_event)
+
         self.appearance_mode_optionemenu.grid(
             row=6, column=0, padx=20, pady=(10, 10))
 
-        self.steam_there = customtkinter.CTkButton(
-            self.paths_frame, text="Search for Steam", command=self.search_steam, fg_color=self.st_fg)
         self.steam_there.grid(row=0, column=1, padx=10, pady=(20, 10))
 
-        self.fs_there = customtkinter.CTkButton(
-            self.paths_frame, text="Search for MSFS", command=self.search_fs, fg_color=self.fs_fg)
         self.fs_there.grid(row=0, column=3, padx=10, pady=(20, 10))
 
-        self.launch = customtkinter.CTkButton(
-            self.paths_frame, text="Launch!", command=self.launch_now)
         self.launch.grid(row=0, column=2, padx=10, pady=(20, 10))
 
         customtkinter.CTkButton(self.va_frame, text="Add Virtual Airline Apps",
@@ -120,13 +141,9 @@ class App(customtkinter.CTk):
         customtkinter.CTkButton(self.on_frame, text="Add Traffic Apps",
                                 command=lambda: self.add_app(3)).pack(pady=10)
 
-        with open("paths.csv", "r", newline="", encoding="utf-8")as inFile:
-            data = csv.reader(inFile)
+        with open("paths.csv", "r", newline="", encoding="utf-8")as in_file:
+            data = csv.reader(in_file)
             data = list(data)
-
-            self.va_list = ["None"]
-            self.ot_list = []
-            self.on_list = ["None"]
 
             self.paths = data
 
@@ -139,7 +156,6 @@ class App(customtkinter.CTk):
                 if path[1] == "3":
                     self.on_list.append(path)
 
-        self.va_radio_var = StringVar(value=self.va_list[0])
         for i, row in enumerate(self.va_list):
             if i == 0:
 
@@ -149,7 +165,6 @@ class App(customtkinter.CTk):
                 customtkinter.CTkRadioButton(self.va_frame, text=row[0][:-4],
                                              variable=self.va_radio_var, value=row).pack(pady=5, anchor="center")
 
-        self.on_radio_var = StringVar(value=self.on_list[0])
         for i, row in enumerate(self.on_list):
             if i == 0:
                 customtkinter.CTkRadioButton(self.on_frame, text=row,
@@ -158,7 +173,6 @@ class App(customtkinter.CTk):
                 customtkinter.CTkRadioButton(self.on_frame, text=row[0][:-4],
                                              variable=self.on_radio_var, value=row).pack(pady=5, anchor="center")
 
-        self.ot_check_var = customtkinter.StringVar(value="on")
         for row in self.ot_list:
 
             switch_var = customtkinter.StringVar(value="off")
@@ -176,13 +190,13 @@ class App(customtkinter.CTk):
         if self.on_radio_var.get() != "None":
             to_launch.append([item.strip(" '")
                               for item in self.on_radio_var.get()[1:-1].split(',')])
-        for i, app in enumerate(self.paths):
-            if app[1] == "0" and i != 0 and self.found_p[0] == 1:
-                to_launch.append(app)
+        for i, app_to_run in enumerate(self.paths):
+            if app_to_run[1] == "0" and i != 0 and self.found_p[0] == 1:
+                to_launch.append(app_to_run)
 
-        for app in to_launch:
-            print("launchng", app)
-            os.startfile(app[2])
+        for app_run in to_launch:
+            print("launchng", app_run)
+            os.startfile(app_run[2])
         if self.found_p[0] == 1:
             print("using steam")
             self.wait_steam()

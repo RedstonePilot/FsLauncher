@@ -28,8 +28,8 @@ class App(customtkinter.CTk):
         self.options = []
         self.thread_main = threading.Thread(target=self.draw_window)
         self.thread_main.start()
-        self.fs_fg = 0
-        self.st_fg = 0
+        self.fs_fg = "red3"
+        self.st_fg = "red3"
         self.sidebar_frame = customtkinter.CTkFrame(
             self, width=140, corner_radius=0)
         self.paths_frame = customtkinter.CTkFrame(
@@ -263,7 +263,7 @@ class App(customtkinter.CTk):
 
     def search_steam(self):
         """looks for the steam.exe file on the computer"""
-        exp_loc_steam = "C:/Program Files (x86)/Steam/steam.exe"
+        exp_loc_steam = "D:/Program Files (x86)/Steam/steam.exe"
 
         in_expected_loc_steam = os.path.isfile(exp_loc_steam)
         if not in_expected_loc_steam:

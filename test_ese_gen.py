@@ -4,10 +4,11 @@ import tkinter as tk
 window = tk.Tk()
 
 # Set the window title
-window.title("MSFS_Standin")
+window.title("other_Test")
 
 # Set the window size
 window.geometry("400x300")
+window.config(bg="purple")
 
 # Start the window's event loop
 window.mainloop()
